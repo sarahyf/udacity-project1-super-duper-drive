@@ -17,7 +17,7 @@ public interface NoteMapper {
     Note getNote();
 
     
-    @Select("SELECT * FROM NOTES WHERE userId = #{userId}")
+    @Select("SELECT * FROM NOTES WHERE userid = #{userId}")
     List<Note> getAllNotes(Integer userId);
     
 
@@ -28,6 +28,6 @@ public interface NoteMapper {
     @Update("UPDATE NOTES SET ")
     void updateNote();
 
-    @Delete("DELETE FROM NOTES WHERE noteId = #{noteId}")
+    @Delete("DELETE FROM NOTES WHERE noteid = #{noteId}")
     void deleteNote(Integer noteId);
 }
