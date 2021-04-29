@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-//@RequestMapping("/home")
 public class HomeController {
 
     private FileService fileService;
@@ -42,41 +41,14 @@ public class HomeController {
 
     @GetMapping("/home")
     public String homeView(Authentication authentication, @ModelAttribute("newNote") Note note, @ModelAttribute("newCredential") Credential credential, Model model) {
-       // if(userService.getUser(authentication.getName()) != null) {
             Integer userId = userService.getUser(authentication.getName()).getUserId();
 
             model.addAttribute("allNotes", noteService.getAllNotes(userId));
             model.addAttribute("allCredentials", credentialService.getAllCredentials(userId));
-      //  }
  
         return "home";
     }
 
-    /*@PostMapping()
-    public String uploadFile(@ModelAttribute File file, @ModelAttribute User user, Model model) {
-
-        if(fileService.isFileNameAvailable(file.getFileName(), user.getUsername())) {
-            int i = fileService.uploadFile(file);
-            System.out.println("fileName:" + file.getFileName());
-            System.out.println("username:" + user.getUsername());
-            System.out.println("INSERT ID:" + i);
-        }
-
-        return "home";
-    }*/
-
-   /* @GetMapping("/home#note")
-    public String homeView2(Authentication authentication, @ModelAttribute("newNote") Note note, Model model) {
-        // if(userService.getUser(authentication.getName()) != null) {
-        Integer userId = userService.getUser(authentication.getName()).getUserId();
-
-        model.addAttribute("allNotes", noteService.getAllNotes(userId));
-        // }
-
-        return "home";
-    }*/
-
-   // @PostMapping("/home")
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "noteSubmit")
     public String addNote(Authentication authentication, @ModelAttribute("newNote") Note note, Model model) {
         System.out.println("note");
@@ -103,41 +75,6 @@ public class HomeController {
         return "home";
     }
 
-    @GetMapping("/home/delete")
-    public String homeViewAfterDelete(Authentication authentication, @ModelAttribute("aNote") Note note, Model model) {
-       // homeView(authentication, note, model);
-
-        return "home";
-    }
-
-    @PostMapping("#file")
-    public String addFile(Authentication authentication, @ModelAttribute File file, Model model) {
-        System.out.println("file");
-        Integer userId = userService.getUser(authentication.getName()).getUserId();
-
-       // note.setUserId(userId);
-       // noteService.addNote(note);
-
-      //  model.addAttribute("allNotes", noteService.getAllNotes(userId));
-
-        return "home";
-    }
-
-    // @PostMapping("#credentials")
-    // public String addCredentials(Authentication authentication, @ModelAttribute File file, Model model) {
-    //     System.out.println("credentials");
-    //    // Integer userId = userService.getUser(authentication.getName()).getUserId();
-
-    //     // note.setUserId(userId);
-    //     // noteService.addNote(note);
-
-    //     // model.addAttribute("allNotes", noteService.getAllNotes(userId));
-
-    //     return "home";
-    // }
-
-   /* @PostMapping("/home")
-    @ModelAttribute("newCredentials") this was working well */
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "credentialSubmit")
     public String addCredential(Authentication authentication, @ModelAttribute("newCredential") Credential credential, Model model) {
         System.out.println("addCredentials");
