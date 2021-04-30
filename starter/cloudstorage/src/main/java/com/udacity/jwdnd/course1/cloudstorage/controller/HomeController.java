@@ -50,13 +50,19 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "noteSubmit")
-    public String addNote(Authentication authentication, @ModelAttribute("newNote") Note note, Model model) {
+    public String addEditNote(Authentication authentication, @ModelAttribute("newNote") Note note, Model model) {
         System.out.println("note");
         Integer userId = userService.getUser(authentication.getName()).getUserId();
 
         note.setUserId(userId);
-        noteService.addNote(note);
-        
+
+        if(note.getNoteId() != null) {
+            System.out.println(note.getNoteId());
+            noteService.updateNote(note);
+        } else {
+            noteService.addNote(note);
+        }
+
         model.addAttribute("allNotes", noteService.getAllNotes(userId));
     
         return "home";
@@ -76,25 +82,36 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "credentialSubmit")
-    public String addCredential(Authentication authentication, @ModelAttribute("newCredential") Credential credential, Model model) {
+    public String addEditCredential(Authentication authentication, @ModelAttribute("newCredential") Credential credential, Model model) {
         System.out.println("addCredentials");
-    
         Integer userId = userService.getUser(authentication.getName()).getUserId();
 
         credential.setUserId(userId);
-        credentialService.addCredential(credential);
+
+        if(credential.getCredentialId() != null) {
+            System.out.println(credential.getCredentialId());
+            credentialService.updateCredential(credential);
+        } else {
+            credentialService.addCredential(credential);
+        }
 
         model.addAttribute("allCredentials", credentialService.getAllCredentials(userId));
 
         return "home";
     }
 
-    @RequestMapping(value = "/home/edit", method = RequestMethod.POST, params = "credentialEdit")
-    public String editCredential(Authentication authentication, @ModelAttribute("aCredential") Credential credential,
-            Model model) {
-        System.out.println("editCredentials");
+    @ModelAttribute("plainTextPassword")
+    public String decryptPassword(@ModelAttribute("aCredential") Credential credential) {
+        if(credential.getPassword() != null && credential.getCredentialId() != null) {
+            System.out.println(credential.getPassword());
+            return credentialService.decryptPassword(credential);
+        }
+        
+        return "password";
+            //     Integer userId = userService.getUser(authentication.getName()).getUserId();
+            //     credential.setUserId(userId);
 
-        return "home";
+            // model.addAttribute("plainTextPassword", credentialService.decryptPassword(credential));
     }
 
     //the items are duplicated when I refresh the page, so take it into consideration.

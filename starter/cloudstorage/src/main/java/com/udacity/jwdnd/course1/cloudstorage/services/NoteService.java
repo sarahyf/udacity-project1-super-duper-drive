@@ -20,6 +20,10 @@ public class NoteService {
         return noteMapper.insertNote(new Note(null, note.getNoteTitle(), note.getNoteDescription(), note.getUserId()));
     }
 
+    public void updateNote(Note note) {
+        noteMapper.updateNote(note);
+    }
+
     public List<Note> getAllNotes(Integer userId) {
         return noteMapper.getAllNotes(userId);
     }

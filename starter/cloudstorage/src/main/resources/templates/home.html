@@ -77,7 +77,7 @@
                                 <tbody th:each="aNote : ${allNotes}">
                                     <tr>
                                         <td>
-                                            <button type="button" class="btn btn-success">Edit</button>
+                                            <button type="button" class="btn btn-success" th:noteId-edit="${aNote.noteId}" th:noteTitle-edit="${aNote.noteTitle}" th:noteDescription-edit="${aNote.noteDescription}" th:onclick="showNoteModal(this.getAttribute('noteId-edit'), this.getAttribute('noteTitle-edit'), this.getAttribute('noteDescription-edit'))">Edit</button>
                                             <a class="btn btn-danger" name="deleteNote" th:href="@{/home}">Delete</a>
                                         </td>
                                         <th scope="row" th:text="${aNote.noteTitle}">Example Note Title</th>
@@ -136,7 +136,7 @@
                                 <tbody th:each="aCredential : ${allCredentials}">
                                 <tr>
                                     <td>
-                                        <button type="button" class="btn btn-success" name="credentialEdit" th:credentialId-edit="${aCredential.credentialId}" th:url-edit="${aCredential.url}" th:username-edit="${aCredential.username}" th:password-edit="${aCredential.password}" th:onclick="showCredentialModal(this.getAttribute('credentialId-edit'), this.getAttribute('url-edit'), this.getAttribute('username-edit'), this.getAttribute('password-edit'))">Edit</button>
+                                        <button type="button" class="btn btn-success" name="credentialEdit" th:credentialId-edit="${aCredential.credentialId}" th:url-edit="${aCredential.url}" th:username-edit="${aCredential.username}" th:password-edit="${plainTextPassword}" th:onclick="showCredentialModal(this.getAttribute('credentialId-edit'), this.getAttribute('url-edit'), this.getAttribute('username-edit'), this.getAttribute('password-edit'))">Edit</button>
                                         <a class="btn btn-danger">Delete</a>
                                     </td>
                                     <th scope="row" th:text="${aCredential.url}">Example Credential URL</th>
