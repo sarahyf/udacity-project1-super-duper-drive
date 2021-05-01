@@ -35,8 +35,8 @@ public class CredentialService {
         return credentialMapper.getAllCredentials(userId);
     }
 
-    public void deleteCredential(Credential credential) {
-        credentialMapper.deleteCredential(credential.getCredentialId());
+    public void deleteCredential(Integer credentialId) {
+        credentialMapper.deleteCredential(credentialId);
     }
 
     private Credential encryptPassword(Credential credential) {
