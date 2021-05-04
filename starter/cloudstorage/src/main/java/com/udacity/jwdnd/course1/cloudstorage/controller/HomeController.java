@@ -1,8 +1,8 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.ErrorManager;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
@@ -12,7 +12,6 @@ import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,7 +22,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +35,7 @@ public class HomeController {
     private NoteService noteService;
     private UserService userService;
     private CredentialService credentialService;
+    private static boolean checkError = false;
 
     public HomeController(FileService fileService, NoteService noteService, UserService userService, CredentialService credentialService) {
         this.fileService = fileService;
@@ -53,76 +52,67 @@ public class HomeController {
             model.addAttribute("allNotes", noteService.getAllNotes(userId));
             model.addAttribute("allCredentials", credentialService.getAllCredentials(userId));
             model.addAttribute("credentialService", credentialService);
- 
+            model.addAttribute("fileService", fileService);
+            model.addAttribute("filesNames", fileService.getFilesName(userId));
+
+            if(checkError) {
+                model.addAttribute("errorMessage", "File name already exists");
+                checkError = false;
+            }
+
         return "home";
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "fileSubmit")
-    //@PostMapping("/home")
     public String uploadFile(Authentication authentication, @RequestParam("fileUpload") MultipartFile fileUpload, Model model,
-            RedirectAttributes redirectAttributes) throws IOException{
-        try {
+            RedirectAttributes redirectAttributes) throws IOException {
             Integer userId = userService.getUser(authentication.getName()).getUserId();
+
+            model.addAttribute("uploadedFileName", fileUpload.getOriginalFilename());
+            System.out.println(fileUpload.getOriginalFilename());
+            model.addAttribute("filesNames", fileService.getFilesName(userId));
 
             if(fileService.isFileNameAvailable(fileUpload.getOriginalFilename(), userId)) {
                 InputStream fis = fileUpload.getInputStream();
-
-                System.out.println(fileUpload.getContentType());
-                System.out.println(fileUpload.getResource());
-                System.out.println(fileUpload.getName());
-                System.out.println(fileUpload.getOriginalFilename());
-                System.out.println(fileUpload.getBytes());
-                System.out.println(fileUpload.getInputStream());
 
                 fileService.uploadFile(new File(null, fileUpload.getOriginalFilename(), fileUpload.getContentType(),
                         fileUpload.getSize(), userId, fis));
 
                 model.addAttribute("allFiles", fileService.getAllUserFile(userId));
             } else {
+                model.addAttribute("errorMessage", "File name already exists");
+                model.addAttribute("allFiles", fileService.getAllUserFile(userId));
+                model.addAttribute("filesNames", fileService.getFilesName(userId));
+                model.addAttribute("uploadedFileName", fileUpload.getOriginalFilename());
+
                 redirectAttributes.addAttribute("error", true);
-                redirectAttributes.addAttribute("message", "File name already exists!");
+                redirectAttributes.addAttribute("message", "File name already exists");
+                //displayingErrorMessage("File name already exists");
+                checkError = true;
                 return "redirect:/home";
             }
 
-        } catch(Exception exception) {
-            System.out.println("at catch");
-            throw exception;
-        }
         return "home";
     }
 
+//    @ModelAttribute("errorMessage")
+//     public String displayingErrorMessage(String errorMessage) {
+//         System.out.println(errorMessage);
+//         return errorMessage;
+//        // return "File name already exists";
+//     }
+
     @RequestMapping(value = "/home/file/download/{fileId}", method = RequestMethod.GET)
-    public ResponseEntity downloadFile(Authentication authentication, @ModelAttribute("aFile") File file, Model model) throws IOException{
-        Integer userId = userService.getUser(authentication.getName()).getUserId();
+    public ResponseEntity downloadFile(Authentication authentication, @ModelAttribute("aFile") File file, Model model) {
+        file.setUserId(userService.getUser(authentication.getName()).getUserId());
 
-        System.out.println("in download method");
-        file.setUserId(userId);
-       // fileService.downloadFileData(file);
+        InputStreamResource resource = new InputStreamResource(fileService.getFile(file).getFileData());
 
-        //ByteArrayResource resource = new ByteArrayResource(fileService.downloadFileData(file));
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(fileService.getFile(file).getContentType()))
+               .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=\"" + fileService.getFile(file)
+                                .getFileName() + "\"")
+               .body(resource);
 
-        model.addAttribute("allFiles", fileService.getAllUserFile(userId));
-
-        System.out.println(fileService.getFile(file).getContentType());
-
-
-        java.io.File fileF = new java.io.File(fileService.getFile(file).getFileName());
-        InputStream resource = fileService.getFile(file).getFileData();
-        HttpHeaders headers = new HttpHeaders();
-
-        headers.add("Content-Disposition", String.format("inline; filename=\"%s\"", 
-                fileService.getFile(file).getFileName()));
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-        ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers).contentLength(fileF.length()).contentType(MediaType.parseMediaType(
-                "multipart/form-data")).body(resource);
-        return responseEntity;
-
-       /* return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/text"))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=\"" + fileService.getFile(file)
-                        .getContentType() + "\"")
-                .body(fileService.getFile(file).getContentType());*/
     }
 
     @RequestMapping(value = "/home/file/{fileId}", method = RequestMethod.GET)

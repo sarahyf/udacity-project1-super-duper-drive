@@ -1,6 +1,5 @@
 package com.udacity.jwdnd.course1.cloudstorage.services;
 
-import java.io.InputStream;
 import java.util.List;
 
 import com.udacity.jwdnd.course1.cloudstorage.mapper.FileMapper;
@@ -35,6 +34,10 @@ public class FileService {
 
     public List<File> getAllUserFile(Integer userId) {
         return fileMapper.getAllFiles(userId);
+    }
+
+    public List<String> getFilesName(Integer userId) {
+        return fileMapper.getFilesName(userId);
     }
 
 }
