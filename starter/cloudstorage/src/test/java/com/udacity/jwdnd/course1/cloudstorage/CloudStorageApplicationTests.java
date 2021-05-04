@@ -15,6 +15,8 @@ class CloudStorageApplicationTests {
 
 	private WebDriver driver;
 
+	public String baseURL;
+
 	@BeforeAll
 	static void beforeAll() {
 		WebDriverManager.chromedriver().setup();
@@ -23,6 +25,7 @@ class CloudStorageApplicationTests {
 	@BeforeEach
 	public void beforeEach() {
 		this.driver = new ChromeDriver();
+		baseURL = baseURL = "http://localhost:" + port;
 	}
 
 	@AfterEach
@@ -34,8 +37,48 @@ class CloudStorageApplicationTests {
 
 	@Test
 	public void getLoginPage() {
-		driver.get("http://localhost:" + this.port + "/login");
+		driver.get(baseURL + "/login");
 		Assertions.assertEquals("Login", driver.getTitle());
+	}
+
+	@Test
+	public void getSignupPage() {
+		driver.get(baseURL + "/signup");
+		Assertions.assertEquals("Sign Up", driver.getTitle());
+	}
+
+	@Test
+	public void homePageIsProtected() {
+		driver.get(baseURL + "/home");
+		Assertions.assertEquals("Login", driver.getTitle());
+	}
+
+	@Test
+	public void testSigninLoginAccessHomePageLogoutProtectHomePage() {
+		String username = "user";
+		String password = "user";
+
+		// signing up a new user
+		driver.get(baseURL + "/signup");
+		System.out.println(baseURL + "/signup");
+		SignupPage signinPage = new SignupPage(driver);
+		signinPage.signup("user", "user", username, password);
+
+		//logging in the user
+		driver.get(baseURL + "/login");
+		LoginPage loginPage = new LoginPage(driver);
+		loginPage.login(username, password);
+
+		//able to access to home page
+		driver.get(baseURL + "/home");
+
+		//logging out the user
+		HomePage homePage = new HomePage(driver);
+		homePage.logout();
+		
+		//not able to access the home page
+		homePageIsProtected();
+
 	}
 
 }
