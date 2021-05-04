@@ -89,10 +89,9 @@ public class HomeController {
                 redirectAttributes.addAttribute("message", "File name already exists");
                 //displayingErrorMessage("File name already exists");
                 checkError = true;
-                return "redirect:/home";
             }
 
-        return "home";
+        return "redirect:/home";
     }
 
 //    @ModelAttribute("errorMessage")
@@ -124,7 +123,7 @@ public class HomeController {
 
         model.addAttribute("allFiles", fileService.getAllUserFile(userId));
 
-        return "home";
+        return "redirect:/home";
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "noteSubmit")
@@ -141,7 +140,7 @@ public class HomeController {
 
         model.addAttribute("allNotes", noteService.getAllNotes(userId));
     
-        return "home";
+        return "redirect:/home";
     }
 
    @RequestMapping(value = "/home/note/{noteId}", method = RequestMethod.GET)
@@ -153,7 +152,7 @@ public class HomeController {
 
         model.addAttribute("allNotes", noteService.getAllNotes(userId));
         
-        return "home";
+        return "redirect:/home";
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "credentialSubmit")
@@ -171,7 +170,7 @@ public class HomeController {
         model.addAttribute("allCredentials", credentialService.getAllCredentials(userId));
         model.addAttribute("credentialService", credentialService);
 
-        return "home";
+        return "redirect:/home";
     }
 
     @RequestMapping(value = "/home/credential/{credentialId}", method = RequestMethod.GET)
@@ -184,7 +183,7 @@ public class HomeController {
 
         model.addAttribute("allCredentials", credentialService.getAllCredentials(userId));
 
-        return "home";
+        return "redirect:/home";
     }
 
     //the items are duplicated when I refresh the page, so take it into consideration.
