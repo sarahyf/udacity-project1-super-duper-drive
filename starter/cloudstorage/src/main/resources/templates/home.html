@@ -34,14 +34,9 @@
                                     <div class="col-sm-6">
                                         <input type="file" class="form-control-file" id="fileUpload" name="fileUpload">
                                     </div>
-                                    <div th:each="aFile : ${filesNames}"></div>
                                     <div class="col-sm-4">
-                                        <!-- <p th:text="${aFile}"></p> -->
-                                        <!-- th:each="aFile : ${filesNames}" -->
-                                        <!-- <span th:text="${filesNames}"></span> -->
-                                        <button type="submit" class="btn btn-dark" name="fileSubmit" th:file-name="${uploadedFileName}" th:files-names="${aFile}" th:onclick="displayingErrorMessage(this.getAttribute('file-name'), this.getAttribute('files-names'))">Upload</button>
+                                        <button type="submit" class="btn btn-dark" name="fileSubmit">Upload</button>
                                         <h5 th:text="${errorMessage}" name="errorMessage"></h5>
-                                        <span th:error=${errorMessage} th:onclick="'alert(\'a\');'"></span>
                                     </div>
                                 </div>
                             </div>
@@ -215,34 +210,6 @@
                 $('#credential-password').val(password ? password : '');
                 $('#credentialModal').modal('show');
             }
-
-            function displayingErrorMessage(fileName, filesNames) {
-               /* console.log(errorMessage);
-                if(errorMessage != '' && errorMessage != null) {
-                    alert(errorMessage);
-                }*/
-                // for (var i = 0; i < allFiles; i++) {
-                //     console.log(allFiles[i].);
-                //     //Do something
-                // }
-                //console.log(allFiles[0]);
-               // console.log(aFile);
-                console.log(filesNames);
-                console.log(filesNames[0]);
-                console.log(filesNames[1]);
-                console.log(fileName);
-
-                // if(fileName == aFile) {
-                //     alert("error");
-                // }
-            }
-
-            var close = document.getElementsByClassName("errorMessage");
-            if(close != null && close != '') {
-                console.log(close);
-            }
-
-
         </script>
     </body>
 </html>

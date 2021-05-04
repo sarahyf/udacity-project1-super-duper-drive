@@ -36,8 +36,4 @@ public class FileService {
         return fileMapper.getAllFiles(userId);
     }
 
-    public List<String> getFilesName(Integer userId) {
-        return fileMapper.getFilesName(userId);
-    }
-
 }

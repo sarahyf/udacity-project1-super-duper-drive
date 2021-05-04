@@ -1,6 +1,5 @@
 package com.udacity.jwdnd.course1.cloudstorage.mapper;
 
-import java.io.InputStream;
 import java.util.List;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
@@ -28,8 +27,4 @@ public interface FileMapper {
 
     @Delete("DELETE FROM FILES WHERE fileid = #{fileId}")
     void deleteFile(File file);
-
-    @Select("SELECT filename FROM FILES WHERE userid = #{userId}")
-    List<String> getFilesName(Integer userId);
-
 }

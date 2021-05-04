@@ -2,7 +2,6 @@ package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.ErrorManager;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
@@ -52,8 +51,6 @@ public class HomeController {
             model.addAttribute("allNotes", noteService.getAllNotes(userId));
             model.addAttribute("allCredentials", credentialService.getAllCredentials(userId));
             model.addAttribute("credentialService", credentialService);
-            model.addAttribute("fileService", fileService);
-            model.addAttribute("filesNames", fileService.getFilesName(userId));
 
             if(checkError) {
                 model.addAttribute("errorMessage", "File name already exists");
@@ -68,10 +65,6 @@ public class HomeController {
             RedirectAttributes redirectAttributes) throws IOException {
             Integer userId = userService.getUser(authentication.getName()).getUserId();
 
-            model.addAttribute("uploadedFileName", fileUpload.getOriginalFilename());
-            System.out.println(fileUpload.getOriginalFilename());
-            model.addAttribute("filesNames", fileService.getFilesName(userId));
-
             if(fileService.isFileNameAvailable(fileUpload.getOriginalFilename(), userId)) {
                 InputStream fis = fileUpload.getInputStream();
 
@@ -80,26 +73,13 @@ public class HomeController {
 
                 model.addAttribute("allFiles", fileService.getAllUserFile(userId));
             } else {
-                model.addAttribute("errorMessage", "File name already exists");
-                model.addAttribute("allFiles", fileService.getAllUserFile(userId));
-                model.addAttribute("filesNames", fileService.getFilesName(userId));
-                model.addAttribute("uploadedFileName", fileUpload.getOriginalFilename());
-
                 redirectAttributes.addAttribute("error", true);
                 redirectAttributes.addAttribute("message", "File name already exists");
-                //displayingErrorMessage("File name already exists");
                 checkError = true;
             }
 
         return "redirect:/home";
     }
-
-//    @ModelAttribute("errorMessage")
-//     public String displayingErrorMessage(String errorMessage) {
-//         System.out.println(errorMessage);
-//         return errorMessage;
-//        // return "File name already exists";
-//     }
 
     @RequestMapping(value = "/home/file/download/{fileId}", method = RequestMethod.GET)
     public ResponseEntity downloadFile(Authentication authentication, @ModelAttribute("aFile") File file, Model model) {
@@ -185,8 +165,4 @@ public class HomeController {
 
         return "redirect:/home";
     }
-
-    //the items are duplicated when I refresh the page, so take it into consideration.
-    //when a credential is add the already added note disappear 
-
 }

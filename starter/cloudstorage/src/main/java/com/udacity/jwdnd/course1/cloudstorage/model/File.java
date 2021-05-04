@@ -1,7 +1,6 @@
 package com.udacity.jwdnd.course1.cloudstorage.model;
 
 import java.io.InputStream;
-import java.sql.Blob;
 
 public class File {
     private Integer fileId;
