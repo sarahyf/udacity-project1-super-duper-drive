@@ -32,10 +32,7 @@ public class NoteTab {
     }
 
     public void addNote() {
-        System.out.println("first");
         addNewNote.click();
-        System.out.println("second");
-        // fillingFields(noteTitle, noteDescription);
     }
 
     public void editNote() {
@@ -48,13 +45,9 @@ public class NoteTab {
     }
 
     public void fillingFields(String noteTitle, String noteDescription) {
-        System.out.println("at fillingFields");
         noteTitleField.sendKeys(noteTitle);
-        System.out.println("noteTitle");
         noteDescriptionField.sendKeys(noteDescription);
-        System.out.println("noteDescription");
         saveNoteButton.click();
-        System.out.println("saveNoteButton");
     }
     
     public void deleteNote() {
