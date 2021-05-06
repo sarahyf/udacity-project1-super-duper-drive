@@ -62,11 +62,11 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
-                        <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showNoteModal()">
+                        <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showNoteModal()" id="add-new-note">
                             + Add a New Note
                         </button>
 
-                        <div class="table-responsive">
+                        <div class="table-responsive" id="note-table">
                             <table class="table table-striped" id="userTable">
                                 <thead>
                                     <tr>
@@ -78,11 +78,11 @@
                                 <tbody th:each="aNote : ${allNotes}">
                                     <tr>
                                         <td>
-                                            <button type="button" class="btn btn-success" th:noteId-edit="${aNote.noteId}" th:noteTitle-edit="${aNote.noteTitle}" th:noteDescription-edit="${aNote.noteDescription}" th:onclick="showNoteModal(this.getAttribute('noteId-edit'), this.getAttribute('noteTitle-edit'), this.getAttribute('noteDescription-edit'))">Edit</button>
-                                            <a class="btn btn-danger" th:href="@{/home/note/{noteId}(noteId=${aNote.noteId})}">Delete</a>
+                                            <button type="button" id="edit-note" class="btn btn-success" th:noteId-edit="${aNote.noteId}" th:noteTitle-edit="${aNote.noteTitle}" th:noteDescription-edit="${aNote.noteDescription}" th:onclick="showNoteModal(this.getAttribute('noteId-edit'), this.getAttribute('noteTitle-edit'), this.getAttribute('noteDescription-edit'))">Edit</button>
+                                            <a class="btn btn-danger" id="delete-note" th:href="@{/home/note/{noteId}(noteId=${aNote.noteId})}">Delete</a>
                                         </td>
-                                        <th scope="row" th:text="${aNote.noteTitle}">Example Note Title</th>
-                                        <td th:text="${aNote.noteDescription}">Example Note Description </td>
+                                        <th scope="row" th:text="${aNote.noteTitle}" id="added-note-title">Example Note Title</th>
+                                        <td th:text="${aNote.noteDescription}" id="added-note-description">Example Note Description </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -113,7 +113,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary" onclick="$('#noteSubmit').click();">Save changes</button>
+                                        <button type="button" class="btn btn-primary" onclick="$('#noteSubmit').click();" id="save-note">Save changes</button>
                                     </div>
                                 </div>
                             </div>
