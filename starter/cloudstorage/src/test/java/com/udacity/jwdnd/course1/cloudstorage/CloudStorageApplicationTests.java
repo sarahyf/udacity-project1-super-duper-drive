@@ -4,6 +4,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.model.Note;
 
 import org.junit.jupiter.api.*;
@@ -24,6 +25,8 @@ class CloudStorageApplicationTests {
 	private WebDriver driver;
 
 	public String baseURL;
+
+	private String decryptedPassword = "";
 
 	@BeforeAll
 	static void beforeAll() {
@@ -188,4 +191,97 @@ class CloudStorageApplicationTests {
 
 	}
 
+	@Test
+	public void testCreatingCredential() {
+		driver.manage().window().maximize();
+
+		creatingAnAccount("user", "user", "user", "user");
+		loginIntoAccount("user", "user");
+
+		HomePage homePage = new HomePage(driver);
+		homePage.credentialsTab();
+		WebDriverWait wait = new WebDriverWait(driver, 2);
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("credentialTable"))));
+
+
+		CredentialsTab credentialsTabObj = new CredentialsTab(driver);
+
+		String credentialURL = "https://localhost:8080/login";
+		String credentialUsername = "user";
+		String credentialPassword = "user";
+
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("add-new-credential"))));
+		credentialsTabObj.addCredential();
+
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("credentialModal"))));
+		driver.switchTo().activeElement();
+
+		credentialsTabObj.fillingFields(credentialURL, credentialUsername, credentialPassword);
+		credentialsTabObj.saveCredential();
+
+		homePage.credentialsTab();
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("credentialTable"))));
+
+		Assertions.assertEquals(credentialURL, driver.findElement(By.id("added-credential-url")).getText());
+		Assertions.assertEquals(credentialUsername, driver.findElement(By.id("added-credential-username")).getText());
+		Assertions.assertNotEquals(credentialPassword, driver.findElement(By.id("added-credential-password")).getText());
+		decryptedPassword = credentialPassword;
+
+	}
+
+	@Test
+	public void testEditingCredential() {
+		testCreatingCredential();
+
+		HomePage homePage = new HomePage(driver);
+
+		CredentialsTab credentialsTabObj = new CredentialsTab(driver);
+
+		WebDriverWait wait = new WebDriverWait(driver, 2);
+
+		String credentialURL = "https://localhost:8080/home";
+		String credentialUsername = "user2";
+		String credentialPassword = "user2";
+
+		credentialsTabObj.editCredential();
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("credentialModal"))));
+		driver.switchTo().activeElement();
+		Assertions.assertNotEquals(decryptedPassword,
+				driver.findElement(By.id("credential-password")).getText());
+		credentialsTabObj.clearTextFields();
+		credentialsTabObj.fillingFields(credentialURL, credentialUsername, credentialPassword);
+		credentialsTabObj.saveCredential();
+
+		homePage.credentialsTab();
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("credentialTable"))));
+
+		Assertions.assertEquals(credentialURL, driver.findElement(By.id("added-credential-url")).getText());
+		Assertions.assertEquals(credentialUsername, driver.findElement(By.id("added-credential-username")).getText());
+		Assertions.assertNotEquals(credentialPassword,
+				driver.findElement(By.id("added-credential-password")).getText());
+		decryptedPassword = credentialPassword;
+	}
+
+	@Test
+	public void testDeletingCredential() {
+		testCreatingCredential();
+
+		HomePage homePage = new HomePage(driver);
+
+		CredentialsTab credentialsTabObj = new CredentialsTab(driver);
+
+		WebDriverWait wait = new WebDriverWait(driver, 2);
+
+		credentialsTabObj.deleteCredential();
+
+		homePage.credentialsTab();
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("credentialTable"))));
+
+		Credential credentialDate = credentialsTabObj.getCredentialData();
+
+		assertEquals("", credentialDate.getUrl());
+		assertEquals("", credentialDate.getUsername());
+		assertEquals("", credentialDate.getPassword());
+
+	}
 }
