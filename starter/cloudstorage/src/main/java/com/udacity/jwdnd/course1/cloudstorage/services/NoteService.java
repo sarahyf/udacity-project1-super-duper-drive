@@ -20,16 +20,20 @@ public class NoteService {
         return noteMapper.insertNote(new Note(null, note.getNoteTitle(), note.getNoteDescription(), note.getUserId()));
     }
 
-    public void updateNote(Note note) {
+    public boolean updateNote(Note note) {
         noteMapper.updateNote(note);
+        Note updatedRow = noteMapper.getNote(note);
+        return note.getNoteTitle().equals(updatedRow.getNoteTitle())
+                && note.getNoteDescription().equals(updatedRow.getNoteDescription());
     }
 
     public List<Note> getAllNotes(Integer userId) {
         return noteMapper.getAllNotes(userId);
     }
 
-    public void deleteNote(Note note) {
+    public boolean deleteNote(Note note) {
         noteMapper.deleteNote(note.getNoteId());
+        return noteMapper.getNote(note) == null;
     }
 
 }

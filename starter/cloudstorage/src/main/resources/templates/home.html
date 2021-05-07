@@ -36,11 +36,23 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <button type="submit" class="btn btn-dark" name="fileSubmit">Upload</button>
-                                        <h5 th:text="${errorMessage}" name="errorMessage"></h5>
                                     </div>
                                 </div>
                             </div>
                         </form>
+
+                        <div>
+                            <div class="alert alert-dark" th:if="${fileActionSucceeded}">
+                                File has been <span th:text="${fileActionSucceeded}"></span> successfully.
+                            </div>
+                            <div class="alert alert-danger" th:if="${fileActionFailed}">
+                                An error on <span th:text="${fileActionFailed}"></span> the file
+                            </div>
+                            <div class="alert alert-danger" th:if="${fileAlreadyExist}">
+                                File name already exist
+                            </div>
+                        </div>
+
                         <div class="table-responsive">
                             <table class="table table-striped" id="fileTable">
                                 <thead>
@@ -66,13 +78,16 @@
                             + Add a New Note
                         </button>
 
-                        <!-- <div class="alert alert-dark" th:if="${addNoteSuccess}">
-                            Note has been added successfully.
+                        <br><br>
+                        <div>
+                            <div class="alert alert-dark" th:if="${noteActionSucceeded}">
+                                Note has been <span th:text="${noteActionSucceeded}"></span> successfully.    
+                            </div>
+                            <div class="alert alert-danger" th:if="${noteActionFailed}">
+                                An error on <span th:text="${noteActionFailed}"></span> the note
+                            </div>
                         </div>
-                        <div class="alert alert-danger" th:if="${addNoteError}">
-                            <span th:text="${signupError}">Example Signup Error Message</span>
-                            An error on adding the note
-                        </div> -->
+                        
 
                         <div class="table-responsive" id="note-table">
                             <table class="table table-striped" id="userTable">
@@ -131,6 +146,16 @@
                         <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" id="add-new-credential" onclick="showCredentialModal()">
                             + Add a New Credential
                         </button>
+
+                        <br><br>
+                        <div>
+                            <div class="alert alert-dark" th:if="${credentialActionSucceeded}">
+                                Credential has been <span th:text="${credentialActionSucceeded}"></span> successfully.
+                            </div>
+                            <div class="alert alert-danger" th:if="${credentialActionFailed}">
+                                An error on <span th:text="${credentialActionFailed}"></span> the credential
+                            </div>
+                        </div>
 
                         <div class="table-responsive">
                             <table class="table table-striped" th:object="${credentials}" id="credentialTable">

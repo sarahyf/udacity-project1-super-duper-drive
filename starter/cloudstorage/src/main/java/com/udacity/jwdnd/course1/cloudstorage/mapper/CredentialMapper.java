@@ -13,8 +13,8 @@ import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface CredentialMapper {
-    @Select("SELECT * FROM CREDENTIALS WHERE ")
-    Credential getCredential();
+    @Select("SELECT * FROM CREDENTIALS WHERE credentialid = #{credentialId}")
+    Credential getCredential(Credential credential);
 
     @Select("SELECT * FROM CREDENTIALS WHERE userid = #{userId}")
     List<Credential> getAllCredentials(Integer userId);
@@ -27,5 +27,5 @@ public interface CredentialMapper {
     void updateCredential(Credential credential);
 
     @Delete("DELETE FROM CREDENTIALS WHERE credentialid = #{credentialId}")
-    void deleteCredential(Integer credentialId);
+    void deleteCredential(Credential credential);
 }

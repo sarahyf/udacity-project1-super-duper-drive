@@ -27,16 +27,21 @@ public class CredentialService {
                 credential.getKey(), credential.getPassword(), credential.getUserId()));
     }
 
-    public void updateCredential(Credential credential) {
+    public boolean updateCredential(Credential credential) {
         credentialMapper.updateCredential(encryptPassword(credential));
+        Credential updatedRow = credentialMapper.getCredential(credential);
+        return credential.getUrl().equals(updatedRow.getUrl())
+                && credential.getUsername().equals(updatedRow.getUsername())
+                && credential.getPassword().equals(updatedRow.getPassword());
     }
 
     public List<Credential> getAllCredentials(Integer userId) {
         return credentialMapper.getAllCredentials(userId);
     }
 
-    public void deleteCredential(Integer credentialId) {
-        credentialMapper.deleteCredential(credentialId);
+    public boolean deleteCredential(Credential credential) {
+        credentialMapper.deleteCredential(credential);
+        return credentialMapper.getCredential(credential) == null;
     }
 
     private Credential encryptPassword(Credential credential) {

@@ -34,7 +34,6 @@ public class HomeController {
     private NoteService noteService;
     private UserService userService;
     private CredentialService credentialService;
-    private static boolean checkError = false;
 
     public HomeController(FileService fileService, NoteService noteService, UserService userService, CredentialService credentialService) {
         this.fileService = fileService;
@@ -50,11 +49,6 @@ public class HomeController {
             model.addAttribute("activeTab", "files");
             getAllTabsData(userId, model);
 
-            if(checkError) {
-                model.addAttribute("errorMessage", "File name already exists");
-                checkError = false;
-            }
-
         return "home";
     }
 
@@ -62,20 +56,27 @@ public class HomeController {
     public String uploadFile(Authentication authentication, @RequestParam("fileUpload") MultipartFile fileUpload, Model model,
             RedirectAttributes redirectAttributes) throws IOException {
             Integer userId = userService.getUser(authentication.getName()).getUserId();
+            String succeededFileAction = null;
+            String failedFileAction = null;
 
             if(fileService.isFileNameAvailable(fileUpload.getOriginalFilename(), userId)) {
                 InputStream fis = fileUpload.getInputStream();
 
-                fileService.uploadFile(new File(null, fileUpload.getOriginalFilename(), fileUpload.getContentType(),
+                int fileAdded = fileService.uploadFile(new File(null, fileUpload.getOriginalFilename(), fileUpload.getContentType(),
                         fileUpload.getSize(), userId, fis));
 
-                getAllTabsData(userId, model);
+                if(fileAdded > 0) {
+                    succeededFileAction = "uploaded";
+                } else {
+                    failedFileAction = "uploading";
+                }
+                model.addAttribute("fileActionSucceeded", succeededFileAction);
+                model.addAttribute("fileActionFailed", failedFileAction);
             } else {
-                redirectAttributes.addAttribute("error", true);
-                redirectAttributes.addAttribute("message", "File name already exists");
-                checkError = true;
+                model.addAttribute("fileAlreadyExist", true);
             }
 
+        getAllTabsData(userId, model);
         model.addAttribute("activeTab", "files");
 
         return "home";
@@ -99,7 +100,11 @@ public class HomeController {
         Integer userId = userService.getUser(authentication.getName()).getUserId();
 
         file.setUserId(userId);
-        fileService.deleteFile(file);
+    
+        if (fileService.deleteFile(file))
+            model.addAttribute("fileActionSucceeded", "deleted");
+        else
+            model.addAttribute("fileActionFailed", "deleting");
 
         getAllTabsData(userId, model);
         model.addAttribute("activeTab", "files");
@@ -110,17 +115,25 @@ public class HomeController {
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "noteSubmit")
     public String addEditNote(Authentication authentication, @ModelAttribute("newNote") Note note, Model model) {
         Integer userId = userService.getUser(authentication.getName()).getUserId();
+        String succeededNoteAction = null;
+        String failedNoteAction = null;
 
         note.setUserId(userId);
 
         if(note.getNoteId() != null) {
-            noteService.updateNote(note);
-            // model.addAttribute("addNoteError", true);
+            if (noteService.updateNote(note))
+                succeededNoteAction = "updated";
+            else
+                failedNoteAction = "updating";
         } else {
-            noteService.addNote(note);
-            // model.addAttribute("addNoteSuccess", true);
+            if (noteService.addNote(note) > 0)
+                succeededNoteAction = "added";
+            else
+                failedNoteAction = "adding";   
         }
 
+        model.addAttribute("noteActionSucceeded", succeededNoteAction);
+        model.addAttribute("noteActionFailed", failedNoteAction);
         getAllTabsData(userId, model);
         model.addAttribute("activeTab", "notes");
 
@@ -132,7 +145,11 @@ public class HomeController {
         Integer userId = userService.getUser(authentication.getName()).getUserId();
 
         note.setUserId(userId);
-        noteService.deleteNote(note);
+
+        if(noteService.deleteNote(note))
+            model.addAttribute("noteActionSucceeded", "deleted");
+        else
+            model.addAttribute("noteActionFailed", "deleting");
 
         getAllTabsData(userId, model);
         model.addAttribute("activeTab", "notes");
@@ -143,15 +160,25 @@ public class HomeController {
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "credentialSubmit")
     public String addEditCredential(Authentication authentication, @ModelAttribute("newCredential") Credential credential, Model model) {
         Integer userId = userService.getUser(authentication.getName()).getUserId();
+        String succeededCredentialAction = null;
+        String failedCredentialAction = null;
 
         credential.setUserId(userId);
 
         if(credential.getCredentialId() != null) {
-            credentialService.updateCredential(credential);
+            if (credentialService.updateCredential(credential))
+                succeededCredentialAction = "updated";
+            else
+                failedCredentialAction = "updating";
         } else {
-            credentialService.addCredential(credential);
+            if (credentialService.addCredential(credential) > 0)
+                succeededCredentialAction = "added";
+            else
+                failedCredentialAction = "adding";
         }
 
+        model.addAttribute("credentialActionSucceeded", succeededCredentialAction);
+        model.addAttribute("credentialActionFailed", failedCredentialAction);
         getAllTabsData(userId, model);
         model.addAttribute("activeTab", "credentials");
 
@@ -159,12 +186,15 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/home/credential/{credentialId}", method = RequestMethod.GET)
-    public String deleteCredential(Authentication authentication, @ModelAttribute("aCredential") Credential credential, Model model,
-            @PathVariable(value = "credentialId") Integer credentialId) {
+    public String deleteCredential(Authentication authentication, @ModelAttribute("aCredential") Credential credential, Model model) {
         Integer userId = userService.getUser(authentication.getName()).getUserId();
 
         credential.setUserId(userId);
-        credentialService.deleteCredential(credentialId);
+
+        if (credentialService.deleteCredential(credential))
+            model.addAttribute("credentialActionSucceeded", "deleted");
+        else
+            model.addAttribute("credentialActionFailed", "deleting");
 
         getAllTabsData(userId, model);
         model.addAttribute("activeTab", "credentials");
