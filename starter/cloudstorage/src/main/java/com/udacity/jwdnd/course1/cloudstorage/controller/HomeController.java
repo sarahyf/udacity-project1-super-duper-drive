@@ -47,10 +47,8 @@ public class HomeController {
     public String homeView(Authentication authentication, Model model) {
             Integer userId = userService.getUser(authentication.getName()).getUserId();
 
-            model.addAttribute("allFiles", fileService.getAllUserFile(userId));
-            model.addAttribute("allNotes", noteService.getAllNotes(userId));
-            model.addAttribute("allCredentials", credentialService.getAllCredentials(userId));
-            model.addAttribute("credentialService", credentialService);
+            model.addAttribute("activeTab", "files");
+            getAllTabsData(userId, model);
 
             if(checkError) {
                 model.addAttribute("errorMessage", "File name already exists");
@@ -71,14 +69,16 @@ public class HomeController {
                 fileService.uploadFile(new File(null, fileUpload.getOriginalFilename(), fileUpload.getContentType(),
                         fileUpload.getSize(), userId, fis));
 
-                model.addAttribute("allFiles", fileService.getAllUserFile(userId));
+                getAllTabsData(userId, model);
             } else {
                 redirectAttributes.addAttribute("error", true);
                 redirectAttributes.addAttribute("message", "File name already exists");
                 checkError = true;
             }
 
-        return "redirect:/home";
+        model.addAttribute("activeTab", "files");
+
+        return "home";
     }
 
     @RequestMapping(value = "/home/file/download/{fileId}", method = RequestMethod.GET)
@@ -101,9 +101,10 @@ public class HomeController {
         file.setUserId(userId);
         fileService.deleteFile(file);
 
-        model.addAttribute("allFiles", fileService.getAllUserFile(userId));
+        getAllTabsData(userId, model);
+        model.addAttribute("activeTab", "files");
 
-        return "redirect:/home";
+        return "home";
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "noteSubmit")
@@ -114,13 +115,16 @@ public class HomeController {
 
         if(note.getNoteId() != null) {
             noteService.updateNote(note);
+            // model.addAttribute("addNoteError", true);
         } else {
             noteService.addNote(note);
+            // model.addAttribute("addNoteSuccess", true);
         }
 
-        model.addAttribute("allNotes", noteService.getAllNotes(userId));
-    
-        return "redirect:/home";
+        getAllTabsData(userId, model);
+        model.addAttribute("activeTab", "notes");
+
+        return "home";
     }
 
    @RequestMapping(value = "/home/note/{noteId}", method = RequestMethod.GET)
@@ -130,9 +134,10 @@ public class HomeController {
         note.setUserId(userId);
         noteService.deleteNote(note);
 
-        model.addAttribute("allNotes", noteService.getAllNotes(userId));
-        
-        return "redirect:/home";
+        getAllTabsData(userId, model);
+        model.addAttribute("activeTab", "notes");
+
+        return "home";
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.POST, params = "credentialSubmit")
@@ -147,10 +152,10 @@ public class HomeController {
             credentialService.addCredential(credential);
         }
 
-        model.addAttribute("allCredentials", credentialService.getAllCredentials(userId));
-        model.addAttribute("credentialService", credentialService);
+        getAllTabsData(userId, model);
+        model.addAttribute("activeTab", "credentials");
 
-        return "redirect:/home";
+        return "home";
     }
 
     @RequestMapping(value = "/home/credential/{credentialId}", method = RequestMethod.GET)
@@ -161,8 +166,17 @@ public class HomeController {
         credential.setUserId(userId);
         credentialService.deleteCredential(credentialId);
 
-        model.addAttribute("allCredentials", credentialService.getAllCredentials(userId));
+        getAllTabsData(userId, model);
+        model.addAttribute("activeTab", "credentials");
 
-        return "redirect:/home";
+        return "home";
     }
+
+    public void getAllTabsData(Integer userId, Model model) {
+        model.addAttribute("allFiles", fileService.getAllUserFile(userId));
+        model.addAttribute("allNotes", noteService.getAllNotes(userId));
+        model.addAttribute("allCredentials", credentialService.getAllCredentials(userId));
+        model.addAttribute("credentialService", credentialService);
+    }
+
 }
