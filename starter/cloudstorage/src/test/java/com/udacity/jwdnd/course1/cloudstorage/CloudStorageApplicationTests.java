@@ -64,14 +64,12 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
 
-	@Test
 	public void creatingAnAccount(String firstName, String lastName, String username, String password) {
 		driver.get(baseURL + "/signup");
 		SignupPage signinPage = new SignupPage(driver);
 		signinPage.signup(firstName, lastName, username, password);
 	}
 
-	@Test
 	public void loginIntoAccount(String username, String password) {
 		driver.get(baseURL + "/login");
 		LoginPage loginPage = new LoginPage(driver);
@@ -83,7 +81,6 @@ class CloudStorageApplicationTests {
 		driver.get(baseURL + "/home");
 	}
 
-	@Test
 	public void loggingout() {
 		HomePage homePage = new HomePage(driver);
 		homePage.logout();
@@ -114,14 +111,15 @@ class CloudStorageApplicationTests {
 	@Test
 	public void testingCreatingNote() {
 		driver.manage().window().maximize();
+		WebDriverWait wait = new WebDriverWait(driver, 2);
 
 		creatingAnAccount("user", "user", "user", "user");
 		loginIntoAccount("user", "user");
 
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("nav-tab"))));
+		wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("nav-notes-tab"))));
 		HomePage homePage = new HomePage(driver);
 		homePage.noteTab();
-		WebDriverWait wait = new WebDriverWait(driver, 2);
-		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("nav-notes-tab"))));
 
 		NoteTab noteTabObj = new NoteTab(driver);
 
